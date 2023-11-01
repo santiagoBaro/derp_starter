@@ -88,7 +88,7 @@ After installing Docker and Node.js, ensure that the versions are compatible wit
     - Follow the AWS security best practices and configure security settings, such as setting up multi-factor authentication (MFA) and creating strong IAM policies.
 </details>
 
-### Create an AWS Elastic Beanstalk Service
+### Create an AWS Elastic Beanstalk Service [Back]
 <details>
     <summary>Click for Step-by-Step tutorial</summary>
 1. **Sign In to AWS Management Console:**
@@ -200,7 +200,7 @@ After installing Docker and Node.js, ensure that the versions are compatible wit
 
 </details>
 
-### Create an AWS S3 Bucket and Making It Publicly Accessible
+### Create an AWS S3 Bucket and Making It Publicly Accessible [Front]
 <details>
     <summary>Click for Step-by-Step tutorial</summary>
 1. **Sign In to AWS Management Console:**
@@ -231,7 +231,7 @@ After installing Docker and Node.js, ensure that the versions are compatible wit
    - Verify the public accessibility of the S3 bucket and its objects by testing the access URL in a web browser or via the AWS CLI.
 </details>
 
-### Create an AWS PostgreSQL Publicly Accessible Database
+### Create an AWS PostgreSQL Publicly Accessible Database [DB]
 <details>
     <summary>Click for Step-by-Step tutorial</summary>
 1. **Sign In to AWS Management Console:**

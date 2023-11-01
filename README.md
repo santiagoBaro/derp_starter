@@ -50,7 +50,8 @@ After installing Docker and Node.js, ensure that the versions are compatible wit
 ======
 
 # AWS deployment (optional)
-
+<details>
+    <summary>Click to expand!</summary>
 ## Step-by-Step Guide to Link a GitHub Repo with CircleCI
 
 1. **Sign in to CircleCI:**
@@ -65,10 +66,11 @@ After installing Docker and Node.js, ensure that the versions are compatible wit
    - Choose the first option `Fastest`
    - Choose `main` as the brach
    - CircleCI will detect your project's configuration file automatically, typically named `.circleci/config.yml`.
-
+</details>
 
 ## Step-by-Step Guide to Creating an AWS Account
-
+<details>
+    <summary>Click to expand!</summary>
 1. **Visit the AWS Website:**
    - Go to the [AWS website](https://aws.amazon.com/).
 
@@ -101,10 +103,11 @@ After installing Docker and Node.js, ensure that the versions are compatible wit
 
 11. **Configure Security Settings:**
     - Follow the AWS security best practices and configure security settings, such as setting up multi-factor authentication (MFA) and creating strong IAM policies.
-
+</details>
 
 ## Step-by-Step Guide to Creating an AWS Elastic Beanstalk Service
-
+<details>
+    <summary>Click to expand!</summary>
 1. **Sign In to AWS Management Console:**
    - Go to the [AWS Management Console](https://aws.amazon.com/console/) and sign in to your AWS account.
 
@@ -140,10 +143,11 @@ After installing Docker and Node.js, ensure that the versions are compatible wit
 
 12. **Test and Verify the Application:**
     - Test your application to verify that it is functioning correctly in the AWS Elastic Beanstalk environment.
-
+</details>
 
 ## Step-by-Step Guide to Creating an AWS IAM User without Console Access
-
+<details>
+    <summary>Click to expand!</summary>
 1. **Sign In to AWS Management Console:**
    - Go to the [AWS Management Console](https://aws.amazon.com/console/) and sign in to your AWS account with appropriate administrative privileges.
 
@@ -173,3 +177,4 @@ After installing Docker and Node.js, ensure that the versions are compatible wit
 
 10. **Store Access Keys Securely:**
     - It is crucial to securely store the access key ID and secret access key as they provide programmatic access to your AWS resources. Consider using AWS Secrets Manager or another secure storage solution to manage the access keys.
+</details>

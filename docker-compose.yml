@@ -1,0 +1,47 @@
+version: '3.9'
+
+
+services:
+  db:
+    image: postgres:14-alpine
+    ports:
+      - '5432:5432'
+
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+
+    volumes:
+      - ./data/db:/var/lib/postgresql/data/
+
+  front:
+    build:
+      dockerfile: Front-Dockerfile
+
+    ports:
+      - '3000:3000'
+
+    volumes:
+      - ./front:/app/front
+
+    depends_on:
+      - back
+
+  back: 
+    build: 
+      dockerfile: Back-Dockerfile
+
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+
+    ports:
+      - '8000:8000'
+
+    volumes:
+      - ./back:/app/back
+
+    depends_on:
+      - db

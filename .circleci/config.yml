@@ -1,0 +1,148 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@2.1.1
+  eb: circleci/aws-elastic-beanstalk@2.0.1
+
+jobs:
+  build-front:
+    docker:
+      # specify the version you desire here
+      - image: cimg/node:16.20.1
+
+    working_directory: ~/bima
+
+    steps:
+      - run:
+          name: Update system libraries 
+          command: sudo apt update
+      - add_ssh_keys:
+          fingerprints:
+            - "a2:92:83:a2:23:6d:2b:4e:7c:3d:91:39:b5:30:0b:a4" 
+      - checkout
+      - run:
+          name: enter the frontend directory
+          command: cd frontend
+      - run:
+          name: Show current branch
+          command: echo ${CIRCLE_BRANCH}
+      - run:
+          name: "Checking Versions"
+          command: |
+            node --version
+            npm --version
+      # Restore local dependencies from cache
+      - run:
+          name: "list directory"
+          command: ls -la
+      - restore_cache:
+          keys:
+            - ${CIRCLE_BRANCH}-front-dependencies-{{ checksum "frontend/package.json" }}
+            - ${CIRCLE_BRANCH}-front-dependencies-
+      # Install project dependencies
+      - run:
+          name: Install local dependencies
+          command: |
+            cd frontend
+            npm install
+      # Cache local dependencies if they don't exist
+      - save_cache:
+          key: ${CIRCLE_BRANCH}-front-dependencies-{{ checksum "frontend/package.json" }}
+          paths:
+            - node_modules
+      - run: |
+          cd frontend
+          if [ "${CIRCLE_BRANCH}" == "main" ]; then
+            npm run build-static:prod
+          fi
+          if [ "${CIRCLE_BRANCH}" == "stage" ]; then
+            npm run build-static:stage
+          fi
+      - persist_to_workspace:
+          root: ~/bima/frontend
+          paths:
+            - out/*
+  deploy-front:
+    docker:
+      - image: cimg/node:16.20.1
+    working_directory: ~/bima/frontend
+    steps:
+      - attach_workspace:
+          at: ~/bima/frontend
+      - run:
+          name: Update system libraries 
+          command: sudo apt update
+      - run:
+          name: Install aws cli
+          command: sudo apt-get -y -qq install awscli
+      # Set the signature version for the S3 auth
+      - run:
+          name: Setting Signature Version 4 for S3 Request Authentication
+          command: aws configure set default.s3.signature_version s3v4
+      - run:
+          name: Deploy to S3
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "main" ]; then
+              aws --region us-west-2 s3 sync out s3://prod-bima-bucket --acl public-read
+            fi
+            if [ "${CIRCLE_BRANCH}" == "stage" ]; then
+              aws --region us-west-2 s3 sync out s3://stage-bima-bucket --acl public-read
+            fi
+
+  build-back:
+    description: "Setup Django application and run tests"
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+          app-dir: backend
+      - run:
+          name: "Run tests"
+          command: python backend/manage.py test
+
+workflows:
+  version: 2
+  build-deploy-front:
+    jobs:
+      - build-front:
+          filters:
+            branches:
+              only:
+                - stage
+                - main
+      - deploy-front:
+          requires:
+            - build-front
+
+  build-deploy-back:
+    jobs:
+      - build-back
+      - eb/deploy:
+          name: deploy-back-stage
+          filters:
+            branches:
+              only:
+                - stage
+          app-dir: backend
+          context: aws-credentials
+          application-name: bima-api
+          environment-name: stage-bima-api
+          platform-version: python-3.11
+          label: version-<<pipeline.number>>
+          requires:
+            - build-back
+      - eb/deploy:
+          name: deploy-back-stage
+          filters:
+            branches:
+              only:
+                - main
+          app-dir: backend
+          context: aws-credentials
+          application-name: bima-api
+          environment-name: prod-bima-api
+          platform-version: python-3.11
+          label: version-<<pipeline.number>>
+          requires:
+            - build-back

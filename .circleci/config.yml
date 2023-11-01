@@ -10,7 +10,7 @@ jobs:
       # specify the version you desire here
       - image: cimg/node:16.20.1
 
-    working_directory: ~/bima
+    working_directory: ~/PROJECT-NAME
 
     steps:
       - run:
@@ -21,8 +21,8 @@ jobs:
             - "a2:92:83:a2:23:6d:2b:4e:7c:3d:91:39:b5:30:0b:a4" 
       - checkout
       - run:
-          name: enter the frontend directory
-          command: cd frontend
+          name: enter the front directory
+          command: cd front
       - run:
           name: Show current branch
           command: echo ${CIRCLE_BRANCH}
@@ -37,21 +37,21 @@ jobs:
           command: ls -la
       - restore_cache:
           keys:
-            - ${CIRCLE_BRANCH}-front-dependencies-{{ checksum "frontend/package.json" }}
+            - ${CIRCLE_BRANCH}-front-dependencies-{{ checksum "front/package.json" }}
             - ${CIRCLE_BRANCH}-front-dependencies-
       # Install project dependencies
       - run:
           name: Install local dependencies
           command: |
-            cd frontend
+            cd front
             npm install
       # Cache local dependencies if they don't exist
       - save_cache:
-          key: ${CIRCLE_BRANCH}-front-dependencies-{{ checksum "frontend/package.json" }}
+          key: ${CIRCLE_BRANCH}-front-dependencies-{{ checksum "front/package.json" }}
           paths:
             - node_modules
       - run: |
-          cd frontend
+          cd front
           if [ "${CIRCLE_BRANCH}" == "main" ]; then
             npm run build-static:prod
           fi
@@ -59,16 +59,16 @@ jobs:
             npm run build-static:stage
           fi
       - persist_to_workspace:
-          root: ~/bima/frontend
+          root: ~/PROJECT-NAME/front
           paths:
             - out/*
   deploy-front:
     docker:
       - image: cimg/node:16.20.1
-    working_directory: ~/bima/frontend
+    working_directory: ~/PROJECT-NAME/front
     steps:
       - attach_workspace:
-          at: ~/bima/frontend
+          at: ~/PROJECT-NAME/front
       - run:
           name: Update system libraries 
           command: sudo apt update
@@ -83,10 +83,7 @@ jobs:
           name: Deploy to S3
           command: |
             if [ "${CIRCLE_BRANCH}" == "main" ]; then
-              aws --region us-west-2 s3 sync out s3://prod-bima-bucket --acl public-read
-            fi
-            if [ "${CIRCLE_BRANCH}" == "stage" ]; then
-              aws --region us-west-2 s3 sync out s3://stage-bima-bucket --acl public-read
+              aws --region us-west-2 s3 sync out s3://PROJECT-BUCKET --acl public-read
             fi
 
   build-back:
@@ -96,10 +93,10 @@ jobs:
       - checkout
       - python/install-packages:
           pkg-manager: pip
-          app-dir: backend
+          app-dir: back
       - run:
           name: "Run tests"
-          command: python backend/manage.py test
+          command: python back/manage.py test
 
 workflows:
   version: 2
@@ -109,7 +106,6 @@ workflows:
           filters:
             branches:
               only:
-                - stage
                 - main
       - deploy-front:
           requires:
@@ -124,10 +120,10 @@ workflows:
             branches:
               only:
                 - main
-          app-dir: backend
+          app-dir: back
           context: aws-credentials
-          application-name: bima-api
-          environment-name: prod-bima-api
+          application-name: PROJECT-API
+          environment-name: PROJECT-ENV
           platform-version: python-3.11
           label: version-<<pipeline.number>>
           requires:

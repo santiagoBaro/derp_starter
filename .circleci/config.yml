@@ -123,20 +123,6 @@ workflows:
           filters:
             branches:
               only:
-                - stage
-          app-dir: backend
-          context: aws-credentials
-          application-name: bima-api
-          environment-name: stage-bima-api
-          platform-version: python-3.11
-          label: version-<<pipeline.number>>
-          requires:
-            - build-back
-      - eb/deploy:
-          name: deploy-back-stage
-          filters:
-            branches:
-              only:
                 - main
           app-dir: backend
           context: aws-credentials

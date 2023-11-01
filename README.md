@@ -50,6 +50,7 @@ After installing Docker and Node.js, ensure that the versions are compatible wit
 ======
 
 # AWS deployment (optional)
+## Step-by-Step Guide to Link a GitHub Repo with CircleCI
 <details>
     <summary>Click to expand!</summary>
 ## Step-by-Step Guide to Link a GitHub Repo with CircleCI
